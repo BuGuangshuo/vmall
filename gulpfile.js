@@ -3,6 +3,7 @@ var {series,parallel,src,dest,watch}=require('gulp');
 var clean=require('gulp-clean');
 var fileInclude = require('gulp-file-include');
 var webserver=require('gulp-webserver');
+var sass=require('gulp-sass');
 //清理dist文件夹的任务
 function cleanTask(){
     return src('./dist',{allowEmpty:true})
@@ -48,17 +49,30 @@ function apiTask(){
             .pipe(dest('./dist/api'));
 }
 
+//同步js到dist
+function jsTask(){
+    return src('./src/js/**')
+            .pipe(dest('./dist/js'));
+}
+
+function sassTask(){
+    return src('./src/css/*.scss')
+        .pipe(sass())
+        .pipe(dest('./dist/css'))
+}
 // 实时的把src中的代码同步到dist中，进行实时预览
 function watchTask(){
     watch('./src/view/**' , htmlTask);
     watch('./src/static/**' , staticTask);
     watch('./src/lib/**' , libTask);
     watch('./src/api/**' , apiTask);
+    watch('./src/js/**' , jsTask);
+    watch('./src/css/**' , sassTask);
 }
 //提供接口
 module.exports={
     //开发调用的接口
-    dev:series(cleanTask,parallel(htmlTask , staticTask , libTask , apiTask),parallel(webTask,watchTask)),
+    dev:series(cleanTask,parallel(htmlTask , staticTask , libTask , apiTask,sassTask, jsTask),parallel(webTask,watchTask)),
     //生产调用的接口
     build:series(cleanTask)
 }
