@@ -2,6 +2,9 @@
   margin: 0;
   padding: 0; }
 
+html {
+  overflow-x: hidden; }
+
 ul, ol {
   list-style: none; }
 
@@ -98,10 +101,46 @@ a {
     position: absolute;
     bottom: 0;
     width: 1920px;
-    height: 400px;
+    height: 29px;
     left: 50%;
     margin-left: -960px;
     background: url(/static/img/bg-slide.png) center bottom no-repeat; }
+  #banner .banner-list {
+    height: 550px; }
+  #banner .button-slider-prev {
+    display: block;
+    width: 60px;
+    height: 60px;
+    background: rgba(0, 0, 0, 0.1);
+    position: absolute;
+    left: 150px;
+    top: 234px;
+    border-radius: 50%;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center; }
+    #banner .button-slider-prev:hover {
+      background: rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      transition: all .5s; }
+  #banner .button-slider-next {
+    display: block;
+    width: 60px;
+    height: 60px;
+    background: rgba(0, 0, 0, 0.1);
+    position: absolute;
+    border-radius: 50%;
+    right: -80px;
+    top: 234px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10; }
+    #banner .button-slider-next:hover {
+      background: rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      transition: all .5s; }
 
 /* index page css */
 .goods {

@@ -13,9 +13,25 @@ define(['jquery'],function($){
     function goodsData(type){
         return $.ajax(`/api/mock/${type}.json`);
     }
+
+    function detailData(type , id){
+        var promise = new Promise((resolve,reject)=>{
+            $.ajax(`/api/mock/${type}.json`).then((res)=>{
+                if(res.code == 0){
+                    for(var i=0;i<res.goods_list.length;i++){
+                        if( res.goods_list[i].goodsId == id ){
+                            resolve(res.goods_list[i]);
+                        }
+                    }
+                }
+            });
+        });
+        return promise;
+    }
     return {
         BannerData,
         Banner2Data,
-        goodsData
+        goodsData,
+        detailData
     }
 })

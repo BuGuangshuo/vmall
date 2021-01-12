@@ -33,9 +33,49 @@ $imgWidth : 1920;
         position: absolute;
         bottom:0;
         width:$imgWidth + px;
-        height:400px;
+        height:29px;
         left:50%;
         margin-left : -$imgWidth/2 + px;
         background:url(/static/img/bg-slide.png) center bottom no-repeat;
+    }
+    .banner-list{
+        height: 550px;
+    }
+    .button-slider-prev{
+        display: block;
+        width: 60px;
+        height: 60px;
+        background: rgba($color: #000000, $alpha: .1);
+        position: absolute;
+        left: 150px;
+        top:234px;
+        border-radius: 50%;
+        z-index:10;
+        @include flexCenter;
+
+        &:hover{
+            background: rgba($color: #000000, $alpha: .2);
+            cursor: pointer;
+            transition: all .5s;
+        }
+    }
+
+    .button-slider-next{
+        display: block; 
+        width: 60px;
+        height: 60px;
+        background: rgba($color: #000000, $alpha: .1);
+        position: absolute;
+        border-radius: 50%;
+        right: -80px;
+        top:234px;
+        @include flexCenter;
+        z-index: 10;
+
+        &:hover{
+            background: rgba($color: #000000, $alpha: .2);
+            cursor: pointer;
+            transition: all .5s;
+        }
     }
 }

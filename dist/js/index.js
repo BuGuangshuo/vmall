@@ -40,7 +40,7 @@ define(['jquery','/js/modules/banner.js','/api/server.js'], function($,initBanne
                 res.goods_list.map((v,i)=>{
                     return `
                         <li>
-                            <a href="#">
+                            <a href="/view/detail.html?type=${res.type}&id=${v.goodsId}" target="_blank">
                                 <div><img src="${v.goodsImg}" alt=""></div>
                                 <h3>${v.goodsName}</h3>
                                 <p>¥${v.goodsPrice}</p>
