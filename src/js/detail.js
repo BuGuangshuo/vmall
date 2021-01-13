@@ -6,8 +6,9 @@ requirejs.config({
     }
 });
 
-
-define(['jquery','/js/modules/banner.js','/api/server.js'] , function($ , initBanner , { Banner2Data,detailData}){
+//['jquery','/js/modules/banner.js', '/js/modules/cartStorage.js' ,'/api/server.js']
+define(['jquery','./modules/banner','./modules/cartStorage','../api/server'] , 
+function($ , initBanner ,{addCartStorage},{ Banner2Data,detailData}){
 
     Banner2Data().then((res)=>{
         if(res.code == 0){
@@ -54,8 +55,8 @@ define(['jquery','/js/modules/banner.js','/api/server.js'] , function($ , initBa
                     <span>+</span>
                     <span>-</span>
                 </div>
-                <div class="detail_message_cart l"><a href="#">加入购物车</a></div>
-                <div class="detail_message_computed l"><a href="#">立即下单</a></div>
+                <div class="detail_message_cart l"><a href="javascript:;">加入购物车</a></div>
+                <div class="detail_message_computed l"><a href="/view/cart.html">立即下单</a></div>
             </div>
         </div>
     `);
@@ -69,7 +70,7 @@ define(['jquery','/js/modules/banner.js','/api/server.js'] , function($ , initBa
 `);
 
     bindGallery();
-    chooseInfo();
+    chooseInfo(data);
     function bindGallery(){
         var $detail_gallery_normal = $('.detail_gallery_normal');
         var $detail_gallery_normal_span = $detail_gallery_normal.find('span');
@@ -117,10 +118,12 @@ define(['jquery','/js/modules/banner.js','/api/server.js'] , function($ , initBa
         });
     }
 
-    function chooseInfo(){  // 右侧信息的交互
+    function chooseInfo(data){  // 右侧信息的交互
         var $detail_message_box = $('.detail_message_box');
         var $span = $('.detail_message_num span');
         var $input = $('.detail_message_num input');
+        var $detail_message_cart = $('.detail_message_cart');
+        var goodsData={};
         $detail_message_box.click(function(){
             $(this).addClass('active').siblings().removeClass('active');
         });
@@ -136,6 +139,19 @@ define(['jquery','/js/modules/banner.js','/api/server.js'] , function($ , initBa
             if( isNaN(Number($(this).val())) ){
                 $(this).val(1);
             }
+        });
+
+        //添加购物车按钮
+        $detail_message_cart.click(function(){
+            goodsData.goodsName = data.goodsName;
+            goodsData.goodsPrice = data.goodsPrice;
+            goodsData.goodsColor = $detail_message_box.filter('.active').html();        //filter jq中过滤方法
+            goodsData.goodsNumber = Number($input.val());
+            goodsData.goodsChecked = true;
+
+            addCartStorage(goodsData,function(){
+                alert('添加成功');
+            });
         });
     }
     

@@ -1,3 +1,165 @@
+define('modules/banner',['jquery'],function($){
+    var $bannerList=$('.banner-list');
+    function initBanner(data){
+        //console.log(data);
+        $bannerList.html(`
+        <ul>
+            ${
+                data.map((v,i)=>{
+                    return `
+                        <li class="${ i==0 ? 'show' : '' }"><a href="${v.imgLink}"><img src="${v.imgUrl}" alt=""></a></li>
+                    `;
+                }).join('')
+            }
+        </ul>
+        <ol>
+                ${
+                    data.map((v,i)=>{
+                        return `
+                            <li class="${ i==0 ? 'active' : '' }"></li>
+                        `;
+                    }).join('')
+                }
+            </ol>
+        `);
+        bindBanner();
+    }
+
+    function bindBanner(){
+
+        var $ulLi = $bannerList.find('ul li');
+        var $btn_pre=$('#banner .button-slider-prev');
+        var $btn_next=$('#banner .button-slider-next');
+        var $olLi=$bannerList.find('ol li');
+        var $img=$bannerList.find('ul li img');
+        var now=0;
+        var timer;
+        autoBanner();
+        $bannerList.on('mouseover','ol li',function(){
+            $(this).attr('class','active').siblings().attr('class','');
+            $ulLi.eq( $(this).index() ).attr('class','show').siblings().attr('class','');
+            now=$(this).index();       
+        })
+
+        $bannerList.on('mouseover',function(){
+            clearInterval(timer);
+        })
+
+        $bannerList.on('mouseout',function(){
+            autoBanner();
+        })
+
+        $btn_pre.on('click',function(){
+            now--;
+            if(now==-1){
+                now=$ulLi.length-1;
+            }
+            $ulLi.eq(now).attr('class','show').siblings().attr('class','');
+            $olLi.eq(now).attr('class','active').siblings().attr('class','');
+        });
+    
+        $btn_next.on('click',function(){
+            now++;
+            if(now==$ulLi.length&&now==$olLi.length){
+                now=0;
+            }
+            $ulLi.eq(now).attr('class','show').siblings().attr('class','');
+            $olLi.eq(now).attr('class','active').siblings().attr('class','');
+        });    
+
+        function autoBanner(){
+            timer=setInterval(function() {
+            now++;
+            if(now==$ulLi.length&&now==$olLi.length){
+                now=0;
+            }
+            $ulLi.eq(now).attr('class','show').siblings().attr('class','');
+            $olLi.eq(now).attr('class','active').siblings().attr('class','');
+        }, 5000);
+    }
+        
+    }
+    
+    return initBanner;
+});
+
+
+define('modules/cartStorage',['jquery'],function($){
+
+    var key='cartList';
+    function addCartStorage(data,cb){
+       //console.log(data);  //打印添加购物车的商品数据
+       var storageData=getCartStorage();
+       var flag=true;
+       var index=0;
+       for(var i=0;i<storageData.length;i++){
+            if(storageData[i].goodsName == data.goodsName && storageData[i].goodsColor == data.goodsColor ){
+                flag=false;
+                index=i;
+            }
+       }
+
+       if(flag){        //添加新数据
+            storageData.push(data);
+            setCartStorage(storageData);
+       }else{           //要累加一条数据
+            storageData[index].goodsNumber+=data.goodsNumber;
+            setCartStorage(storageData);
+       }
+        cb();
+    }
+
+    function setCartStorage(arr){
+        localStorage.setItem(key,JSON.stringify(arr));
+    }
+
+    function getCartStorage(){
+        return JSON.parse(localStorage.getItem(key) || '[]');
+    }
+
+    return {
+        addCartStorage,
+        setCartStorage,
+        getCartStorage
+    }
+});
+//统一处理vmall中的所有数据接口
+define('../api/server',['jquery'],function($){
+    function BannerData(){
+        //返回的是一个promise对象
+        return $.ajax('/api/mock/banner.json');
+    }
+
+    function Banner2Data(){
+        //返回的是一个promise对象
+        return $.ajax('/api/mock/banner2.json');
+    }
+
+    function goodsData(type){
+        return $.ajax(`/api/mock/${type}.json`);
+    }
+
+    function detailData(type , id){
+        var promise = new Promise((resolve,reject)=>{
+            $.ajax(`/api/mock/${type}.json`).then((res)=>{
+                if(res.code == 0){
+                    for(var i=0;i<res.goods_list.length;i++){
+                        if( res.goods_list[i].goodsId == id ){
+                            resolve(res.goods_list[i]);
+                        }
+                    }
+                }
+            });
+        });
+        return promise;
+    }
+    return {
+        BannerData,
+        Banner2Data,
+        goodsData,
+        detailData
+    }
+});
 
 
 requirejs.config({
@@ -6,8 +168,9 @@ requirejs.config({
     }
 });
 
-
-define(['jquery','/js/modules/banner.js','/api/server.js'] , function($ , initBanner , { Banner2Data,detailData}){
+//['jquery','/js/modules/banner.js', '/js/modules/cartStorage.js' ,'/api/server.js']
+define('detail',['jquery','./modules/banner','./modules/cartStorage','../api/server'] , 
+function($ , initBanner ,{addCartStorage},{ Banner2Data,detailData}){
 
     Banner2Data().then((res)=>{
         if(res.code == 0){
@@ -54,8 +217,8 @@ define(['jquery','/js/modules/banner.js','/api/server.js'] , function($ , initBa
                     <span>+</span>
                     <span>-</span>
                 </div>
-                <div class="detail_message_cart l"><a href="#">加入购物车</a></div>
-                <div class="detail_message_computed l"><a href="#">立即下单</a></div>
+                <div class="detail_message_cart l"><a href="javascript:;">加入购物车</a></div>
+                <div class="detail_message_computed l"><a href="/view/cart.html">立即下单</a></div>
             </div>
         </div>
     `);
@@ -69,7 +232,7 @@ define(['jquery','/js/modules/banner.js','/api/server.js'] , function($ , initBa
 `);
 
     bindGallery();
-    chooseInfo();
+    chooseInfo(data);
     function bindGallery(){
         var $detail_gallery_normal = $('.detail_gallery_normal');
         var $detail_gallery_normal_span = $detail_gallery_normal.find('span');
@@ -117,10 +280,12 @@ define(['jquery','/js/modules/banner.js','/api/server.js'] , function($ , initBa
         });
     }
 
-    function chooseInfo(){  // 右侧信息的交互
+    function chooseInfo(data){  // 右侧信息的交互
         var $detail_message_box = $('.detail_message_box');
         var $span = $('.detail_message_num span');
         var $input = $('.detail_message_num input');
+        var $detail_message_cart = $('.detail_message_cart');
+        var goodsData={};
         $detail_message_box.click(function(){
             $(this).addClass('active').siblings().removeClass('active');
         });
@@ -136,6 +301,19 @@ define(['jquery','/js/modules/banner.js','/api/server.js'] , function($ , initBa
             if( isNaN(Number($(this).val())) ){
                 $(this).val(1);
             }
+        });
+
+        //添加购物车按钮
+        $detail_message_cart.click(function(){
+            goodsData.goodsName = data.goodsName;
+            goodsData.goodsPrice = data.goodsPrice;
+            goodsData.goodsColor = $detail_message_box.filter('.active').html();        //filter jq中过滤方法
+            goodsData.goodsNumber = Number($input.val());
+            goodsData.goodsChecked = true;
+
+            addCartStorage(goodsData,function(){
+                alert('添加成功');
+            });
         });
     }
     

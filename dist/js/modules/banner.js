@@ -1,4 +1,4 @@
-define(['jquery'],function($){
+define('modules/banner',['jquery'],function($){
     var $bannerList=$('.banner-list');
     function initBanner(data){
         //console.log(data);
@@ -81,4 +81,4 @@ define(['jquery'],function($){
     }
     
     return initBanner;
-})
+});

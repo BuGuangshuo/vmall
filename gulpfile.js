@@ -4,6 +4,7 @@ var clean=require('gulp-clean');
 var fileInclude = require('gulp-file-include');
 var webserver=require('gulp-webserver');
 var sass=require('gulp-sass');
+var requirejsOptimize=require('gulp-requirejs-optimize');
 //清理dist文件夹的任务
 function cleanTask(){
     return src('./dist',{allowEmpty:true})
@@ -52,6 +53,12 @@ function apiTask(){
 //同步js到dist
 function jsTask(){
     return src('./src/js/**')
+            .pipe(requirejsOptimize({
+                optimize:"none",
+                paths:{                        
+                    "jquery":"empty:"  //不会把jquery模块合并进去
+                }
+            }))
             .pipe(dest('./dist/js'));
 }
 

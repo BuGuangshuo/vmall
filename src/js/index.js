@@ -5,7 +5,8 @@ requirejs.config({
 });
 
 //绝对路径需要带后缀名
-define(['jquery','/js/modules/banner.js','/api/server.js'], function($,initBanner,{BannerData,goodsData}) {
+// ['jquery','/js/modules/banner.js' , '/api/server.js']
+define(['jquery','./modules/banner' , '../api/server'],function($, initBanner , { BannerData , goodsData }){
     //console.log($);
     BannerData().then((res)=>{
         if(res.code==0){
